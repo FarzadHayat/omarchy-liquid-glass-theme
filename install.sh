@@ -29,4 +29,9 @@ fi
 ln -sfn "$SRC" "$LINK"
 
 omarchy theme set liquid-glass
+
+# Floating island bar: a copy of your own stock bar with the islands patch,
+# rebuilt automatically after Omarchy updates. Skipped if you run your own bar.
+bash "$SRC/bar/sync.sh" install || echo "Island bar skipped." >&2
+
 echo "Liquid Glass installed. Uninstall: curl -fsSL https://raw.githubusercontent.com/FarzadHayat/omarchy-liquid-glass-theme/main/uninstall.sh | bash"

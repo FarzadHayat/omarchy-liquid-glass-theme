@@ -1,0 +1,131 @@
+--- a/Bar.qml	2026-11-05 18:02:18.915270301 +1000
++++ b/Bar.qml	2026-11-05 18:02:18.916375410 +1000
+@@ -87,6 +87,14 @@
+   property bool foregroundAnimationEnabled: true
+   property color background: Commons.Color.bar.background
+   readonly property color glassBackground: Qt.rgba(background.r, background.g, background.b, Math.min(background.a, 0.35))
++  // Floating islands: under the Liquid Glass theme a horizontal bar drops its
++  // full-width strip and draws each section as its own capsule, frosted when
++  // glassy and solid black when opaque.
++  property bool islandsTheme: String(themeNameFile.text() || "").trim() === "liquid-glass"
++  readonly property bool islands: islandsTheme && !vertical && !transparent
++  // In islands mode the strip floats this far off its screen edge, and the
++  // capsules fill the strip, so widget highlights sit inside them.
++  readonly property int islandGap: islands ? Style.space(5) : 0
+   property color urgent: Commons.Color.bar.active
+ 
+   // A theme change cross-fades the bar's colors. Cycling the background
+@@ -1555,6 +1563,17 @@
+   // FileView also fires for any change in its path's parent directory, so watch
+   // a path inside current/: every plugin writes to ~/.local/state/omarchy.
+   FileView {
++    id: themeNameFile
++    path: root.stateHome + "/omarchy/current/theme.name"
++    blockLoading: true
++    watchChanges: true
++    printErrors: false
++    onLoaded: root.islandsTheme = String(text() || "").trim() === "liquid-glass"
++    onLoadFailed: root.islandsTheme = false
++    onFileChanged: reload()
++  }
++
++  FileView {
+     path: root.stateHome + "/omarchy/current/theme"
+     watchChanges: true
+     printErrors: false
+@@ -1724,7 +1743,7 @@
+     // An explicit zone instead of Auto: the reserved area stays the strip's
+     // thickness though the window spans its screen.
+     exclusionMode: root.barHidden ? ExclusionMode.Ignore : ExclusionMode.Normal
+-    exclusiveZone: thickness
++    exclusiveZone: thickness + root.islandGap
+ 
+     // While this window's widget or bar-move drag is live, the whole surface
+     // takes input (mask below), so the pointer never leaves the bar surface
+@@ -1829,13 +1848,13 @@
+       id: barStrip
+ 
+       x: root.position === "right" ? parent.width - barWindow.thickness : 0
+-      y: root.position === "bottom" ? parent.height - barWindow.thickness : 0
++      y: root.position === "bottom" ? parent.height - barWindow.thickness - root.islandGap : root.islandGap
+       width: root.vertical ? barWindow.thickness : parent.width
+       height: root.vertical ? parent.height : barWindow.thickness
+ 
+       Rectangle {
+         anchors.fill: parent
+-        color: root.transparent ? "transparent" : (root.glassy ? root.glassBackground : root.background)
++        color: root.transparent || root.islands ? "transparent" : (root.glassy ? root.glassBackground : root.background)
+       }
+ 
+       Loader {
+@@ -1939,6 +1958,9 @@
+ 
+         WidgetPool { id: horizontalPool }
+ 
++        IslandPill { start: leftModules.x; extent: leftModules.width }
++        IslandPill { start: rightModules.x; extent: rightModules.width }
++
+         CenterModules {
+           anchors.fill: parent
+           window: barWindow
+@@ -1947,10 +1969,11 @@
+         }
+ 
+         LeftModules {
++          id: leftModules
+           window: barWindow
+           pool: horizontalPool
+           anchors.left: parent.left
+-          anchors.leftMargin: Style.space(8)
++          anchors.leftMargin: root.islands ? Style.space(14) : Style.space(8)
+           anchors.verticalCenter: parent.verticalCenter
+         }
+ 
+@@ -1959,7 +1982,7 @@
+           pool: horizontalPool
+           id: rightModules
+           anchors.right: parent.right
+-          anchors.rightMargin: Style.space(8)
++          anchors.rightMargin: root.islands ? Style.space(14) : Style.space(8)
+           anchors.verticalCenter: parent.verticalCenter
+         }
+ 
+@@ -2265,6 +2288,26 @@
+     }
+   }
+ 
++  // One floating capsule behind a bar section, `extent` long from `start`,
++  // shown only in islands mode and only around a section that holds widgets.
++  component IslandPill: Rectangle {
++    property real start: 0
++    property real extent: 0
++    readonly property real pad: Style.space(6)
++
++    visible: root.islands && extent > 0
++    x: Math.round(start - pad)
++    y: 0
++    width: Math.round(extent + pad * 2)
++    height: parent.height
++    radius: height / 2
++    // Glassy: frosted see-through capsule with a light rim. Opaque: a solid
++    // black capsule, like a dynamic island.
++    color: root.glassy ? root.glassBackground : "black"
++    border.width: root.glassy ? 1 : 0
++    border.color: Qt.rgba(1, 1, 1, 0.22)
++  }
++
+   component LeftModules: ModuleList {
+     keys: root.layoutWidgets.sections.left
+     region: "left"
+@@ -2333,6 +2376,11 @@
+       function onCenterSectionRevealHeldChanged() { sections.syncPeekEdge() }
+     }
+ 
++    IslandPill {
++      start: beginList.x
++      extent: sections.active ? endList.x + endList.width - beginList.x : 0
++    }
++
+     ModuleList {
+       id: beginList
+       keys: sections.active ? root.layoutWidgets.sections.centerBegin : []

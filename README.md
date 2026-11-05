@@ -2,11 +2,9 @@
 
 [![Built for Omarchy: Theme](https://raw.githubusercontent.com/tcballard/omarchy-badges/75975e5b5bf75e7ede3764bcd2950046f7abfe2c/badges/v1/omarchy-theme.svg)](https://github.com/tcballard/omarchy-badges)
 
-An Apple Liquid Glass style theme for [Omarchy](https://omarchy.org): frosted see-through windows, soft squircle corners, and a thin light-catching rim.
+An Apple Liquid Glass style theme for [Omarchy](https://omarchy.org): frosted see-through windows, a floating island top bar, soft squircle corners, and a thin light-catching rim.
 
 ![Liquid Glass](preview.webp)
-
-<sub>The floating island top bar in the screenshot is a separate bar tweak and is not part of this theme.</sub>
 
 ## Install
 
@@ -16,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/FarzadHayat/omarchy-liquid-glass-th
 
 Why not `omarchy theme install`? For a theme cloned from git, Omarchy only keeps colors, images and shell styling. It drops `hyprland.lua` and the terminal configs, and those carry the blur, rounding, rim and see-through terminals. The installer clones the repo to `~/.local/share/omarchy-liquid-glass-theme` and links it into your themes folder, so Omarchy uses all of it.
 
-Want colors and wallpapers only? That still works:
+Want colors and wallpapers only, without the glass effects or the island bar? That still works:
 
 ```bash
 omarchy theme install https://github.com/FarzadHayat/omarchy-liquid-glass-theme
@@ -28,15 +26,25 @@ omarchy theme install https://github.com/FarzadHayat/omarchy-liquid-glass-theme
 curl -fsSL https://raw.githubusercontent.com/FarzadHayat/omarchy-liquid-glass-theme/main/uninstall.sh | bash
 ```
 
-If Liquid Glass is active, this switches you to Tokyo Night first, then removes the link and the cloned repo.
+This switches you to Tokyo Night if Liquid Glass is active (add `-s -- <theme>` after `bash` to pick another), brings back the stock bar, and removes the theme, the island bar and its update hooks. It also removes a copy installed with `omarchy theme install`.
 
 ## What you get
 
+- A floating island top bar: the left, center and right sections become separate capsules, frosted in the Glassy bar style and solid black in Opaque, like a dynamic island
 - Frosted blur behind see-through windows, the bar, menus, notifications and the OSD
 - 16px squircle corners, a 1px white gradient rim, and a soft floating shadow
 - Terminals (Alacritty, Foot, Kitty, Ghostty) at 70% opacity
 - Apple dark mode system colors, `Yaru-blue-dark` icons
 - Three blurred color wallpapers, each with a matching 5 second intro video
+
+## The island bar
+
+The installer adds an island version of the Omarchy bar. It is built on your machine from your own stock bar plus a small patch ([`bar/islands.patch`](bar/islands.patch)), so it matches your Omarchy version.
+
+- The islands only show while Liquid Glass is active. On any other theme the bar looks like the stock one.
+- After `omarchy update`, and at login, a hook rebuilds it from the new stock bar. If an update changes the bar too much for the patch, you get the stock bar back and a notification. Re-run the install line once the theme is updated.
+- If you already run your own bar clone, the installer leaves it alone and skips the islands.
+- It replaces the bar while installed. Uninstalling restores the stock bar.
 
 ## Palette
 
