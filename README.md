@@ -72,6 +72,15 @@ The installer adds an island version of the Omarchy bar. It is built on your mac
 
 Cycle with Super + Ctrl + Space.
 
+## Appearance settings
+
+Omarchy's Appearance settings apply on top of the theme. Best look: keep Window Transparency on Transparent and Window Corners on Theme.
+
+- **Window Transparency, Glassy:** Replaces the theme's blur with a lighter, darker one, so the frost gets thinner. Terminals keep their 70% opacity.
+- **Window Transparency, Opaque:** Does not make the terminals solid, since they set their own opacity. Edit the terminal config for that.
+- **Window Corners, Sharp or Rounded:** Replace the 16px squircle corners.
+- **No-animations mode (on by default in VMs):** Also turns off blur and shadows, so the glass look is lost.
+
 ## Performance
 
 The blur costs a little GPU while the screen is changing, and next to nothing at idle. On a Radeon 780M at 4K, idle GPU use went from about 1.5% with no blur to about 4% with this theme.
