@@ -6,6 +6,10 @@ An Apple Liquid Glass style theme for [Omarchy](https://omarchy.org): frosted se
 
 ![Liquid Glass](preview.webp)
 
+![Calendar flyout under the island bar](screenshots/calendar.webp)
+
+![See-through terminal running fastfetch](screenshots/terminal.webp)
+
 ## Install
 
 ```bash
