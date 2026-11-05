@@ -30,6 +30,14 @@ stamp_for() {
   { (cd "$1" && find . -type f -print0 | sort -z | xargs -0 sha256sum); sha256sum <"$PATCH"; } | sha256sum | cut -d' ' -f1
 }
 
+# Omarchy draws islands itself once its stock bar reads [bar] style, which the
+# theme's shell.toml sets; the bundled copy is then not needed.
+native_islands() {
+  local src
+  src=$(stock_dir)
+  [[ -n $src ]] && grep -q "Style.bar.style" "$src/Bar.qml"
+}
+
 # Another bar clone the user made themselves; we never replace it.
 other_bar() {
   omarchy-plugin-list --json | jq -r --arg id "$ID" \
@@ -96,6 +104,12 @@ remove_plugin() {
 
 case "${1:-}" in
 install)
+  if native_islands; then
+    remove_plugin
+    remove_hooks
+    echo "Omarchy draws the island bar itself; nothing extra to install."
+    exit 0
+  fi
   existing=$(other_bar)
   if [[ -n $existing ]]; then
     echo "Skipping the island bar: you already use your own bar ($existing)." >&2
@@ -122,6 +136,12 @@ install)
   ;;
 update)
   [[ -d $TARGET ]] || exit 0
+  if native_islands; then
+    remove_plugin
+    remove_hooks
+    notify "Omarchy now draws the island bar itself, so the theme's own copy was removed."
+    exit 0
+  fi
   src=$(stock_dir)
   [[ -n $src ]] || exit 0
   [[ $(cat "$TARGET/$STAMP" 2>/dev/null) == "$(stamp_for "$src")" ]] && exit 0
