@@ -8,7 +8,7 @@ An Apple Liquid Glass style theme for [Omarchy](https://omarchy.org): frosted se
 
 ![Calendar flyout under the island bar](screenshots/calendar.webp)
 
-![See-through terminal running fastfetch](screenshots/terminal.webp)
+![See-through terminal under the island bar](screenshots/terminal.webp)
 
 ## Install
 
